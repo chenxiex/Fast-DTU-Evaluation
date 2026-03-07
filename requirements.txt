@@ -3,5 +3,5 @@ numpy
 tqdm
 open3d
 scipy
-sklearn
+scikit-learn
 plyfile
