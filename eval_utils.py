@@ -71,6 +71,7 @@ def reduce_pts(data_pcd, thresh):
 def limit_cpu_threads_used(cpu_percentage=0.1):
     cpu_num = cpu_count() // 2 
     cpu_num = int(cpu_count() * cpu_percentage) 
+    cpu_num = max(1, cpu_num)
     os.environ ['OMP_NUM_THREADS']        = str(cpu_num) 
     os.environ ['MKL_NUM_THREADS']        = str(cpu_num) 
     os.environ ['NUMEXPR_NUM_THREADS']    = str(cpu_num) 
