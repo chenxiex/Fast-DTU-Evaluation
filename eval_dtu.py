@@ -40,7 +40,12 @@ def eval_worker(opts, args):
     gt_ply      = os.path.join(args.gt_dir, f"Points/stl/stl{scanid:03}_total.ply")
     mask_file   = os.path.join(args.gt_dir, f'ObsMask/ObsMask{scanid}_10.mat')
     plane_file  = os.path.join(args.gt_dir, f'ObsMask/Plane{scanid}.mat')
-    result = comput_one_scan_cuda(scanid, pred_ply, gt_ply, mask_file, plane_file, args=args, shared_list=shared_list)
+    result = comput_one_scan_cuda(scanid, pred_ply, gt_ply, mask_file, plane_file,
+                                  down_dense=args.down_dense, patch=args.patch,
+                                  max_dist=args.max_dist, vis=args.vis,
+                                  vis_thresh=args.vis_thresh, out_dir=args.out_dir,
+                                  voxel_factor=args.voxel_factor,
+                                  args=args, shared_list=shared_list)
     msg = "scan{}\t   acc = {:.4f}   comp = {:.4f}   overall = {:.4f}".format(scanid, result[0], result[1], result[2])
     return msg, result, scanid
 

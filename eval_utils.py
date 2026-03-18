@@ -262,8 +262,8 @@ def comput_one_scan_cuda(scanid,            # the scan id to be computed
     else:
         pbar = tqdm(total=8)
     pbar.set_description(f'[scan{scanid}] read data pcd and stl')
-    pcd_np = read_ply(pred_ply)     # (N,3)
-    stl_np = read_ply(gt_ply)       # (M,3)
+    pcd_np = read_ply(pred_ply).astype(np.float32)  # (N,3)
+    stl_np = read_ply(gt_ply).astype(np.float32)    # (M,3)
     pcd = torch.from_numpy(pcd_np).to(device)
     stl = torch.from_numpy(stl_np).to(device)
 
