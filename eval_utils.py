@@ -309,7 +309,7 @@ def comput_one_scan_cuda(scanid,            # the scan id to be computed
         dist_d2s, dist_s2d, _, _ = chamLoss()(pc_t, gt_t)
         dist_d2s, dist_s2d = torch.sqrt(dist_d2s), torch.sqrt(dist_s2d)
         dist_d2s, dist_s2d = dist_d2s.squeeze(0), dist_s2d.squeeze(0)
-        # torch.cuda.synchronize()
+        torch.cuda.synchronize()
 
     pbar.update(1)
     pbar.set_description(f'[scan{scanid}] compute acc and comp')
@@ -344,8 +344,15 @@ def comput_one_scan_cuda(scanid,            # the scan id to be computed
     if shared_list is not None:
         release_pgb_pos(shared_list, pgb_pos)
     over_all = (mean_d2s + mean_s2d) / 2
+    result = mean_d2s.cpu().numpy(), mean_s2d.cpu().numpy(), over_all.cpu().numpy()
     # print(f"\t\t\tacc.(mm):{mean_d2s:.4f}, comp.(mm):{mean_s2d:.4f}, overall(mm):{over_all:.4f}")
-    return mean_d2s.cpu().numpy(), mean_s2d.cpu().numpy(), over_all.cpu().numpy()
+    # Explicitly free GPU tensors and release CUDA memory back to the allocator so
+    # that subsequent scans start with a clean memory state.
+    del pcd, stl, ObsMask, BB, Res, ground_plane, mask_shape
+    del data_grid, data_grid_in, grid_inbound, in_obs, inbound, above, stl_hom
+    del pc_t, gt_t, dist_d2s, dist_s2d, mean_d2s, mean_s2d, over_all
+    torch.cuda.empty_cache()
+    return result
 
 def compute_scans(scans, method, pred_dir, gt_dir, **kargs):
     t1 = time.time()
